@@ -363,47 +363,82 @@ function generateKnightActions(args: {
         x: args.currentCoords.x,
         y: args.currentCoords.y,
     };
-    let possibleMoves: Coords[] = [
-        {
-            x: cacheCurrentPosition.x - 1,
-            y: cacheCurrentPosition.y - 2,
-        },
-        {
-            x: cacheCurrentPosition.x - 2,
-            y: cacheCurrentPosition.y - 1,
-        },
-        {
-            x: cacheCurrentPosition.x + 1,
-            y: cacheCurrentPosition.y - 2,
-        },
-        {
-            x: cacheCurrentPosition.x + 2,
-            y: cacheCurrentPosition.y - 1,
-        },
-        {
-            x: cacheCurrentPosition.x + 1,
-            y: cacheCurrentPosition.y + 2,
-        },
-        {
-            x: cacheCurrentPosition.x + 2,
-            y: cacheCurrentPosition.y + 1,
-        },
-        {
-            x: cacheCurrentPosition.x - 1,
-            y: cacheCurrentPosition.y + 2,
-        },
-        {
-            x: cacheCurrentPosition.x - 2,
-            y: cacheCurrentPosition.y + 1,
-        },
-    ];
+    let possibleMoves: Coords[] = getPossibleKnightMoves(cacheCurrentPosition);
     for (let possibleMove of possibleMoves) {
-        actions.push({
-            type: "move",
-            payload: {
-                target: possibleMove,
-            },
-        });
+        if (args.boardState[possibleMove.y][possibleMove.x] !== "") {
+            if (
+                args.boardState[possibleMove.y][possibleMove.x].charAt(0) ===
+                args.color
+            ) {
+                continue;
+            } else {
+                actions.push({
+                    type: "take",
+                    payload: {
+                        target: possibleMove,
+                    },
+                });
+            }
+        } else {
+            actions.push({
+                type: "move",
+                payload: {
+                    target: possibleMove,
+                },
+            });
+        }
     }
     return actions;
+}
+
+function getPossibleKnightMoves(pos: Coords): Coords[] {
+    let posChecks: boolean[] = [
+        pos.x - 1 >= minCol && pos.y - 2 >= minRow,
+        pos.x - 2 >= minCol && pos.y - 1 >= minRow,
+        pos.x + 1 <= maxCol && pos.y - 2 >= minRow,
+        pos.x + 2 <= maxCol && pos.y - 1 >= minRow,
+        pos.x + 1 <= maxCol && pos.y + 2 <= maxRow,
+        pos.x + 2 <= maxCol && pos.y + 1 <= maxRow,
+        pos.x - 1 >= minCol && pos.y + 2 <= maxRow,
+        pos.x - 2 >= minCol && pos.y + 1 <= maxRow,
+    ];
+    const allMoves = [
+        {
+            x: pos.x - 1, // i=3, i=6
+            y: pos.y - 2,
+        },
+        {
+            x: pos.x - 2, // i=
+            y: pos.y - 1,
+        },
+        {
+            x: pos.x + 1,
+            y: pos.y - 2,
+        },
+        {
+            x: pos.x + 2,
+            y: pos.y - 1,
+        },
+        {
+            x: pos.x + 1,
+            y: pos.y + 2,
+        },
+        {
+            x: pos.x + 2,
+            y: pos.y + 1,
+        },
+        {
+            x: pos.x - 1,
+            y: pos.y + 2,
+        },
+        {
+            x: pos.x - 2,
+            y: pos.y + 1,
+        },
+    ];
+    let cacheMoves: Coords[] = [];
+    for (let i = 0; i < posChecks.length; i++) {
+        if (posChecks[i]) cacheMoves = [...cacheMoves, allMoves[i]];
+    }
+    return cacheMoves;
 }
