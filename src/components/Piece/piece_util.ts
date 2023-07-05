@@ -458,40 +458,178 @@ function generateRookActions(args: {
         x: args.currentCoords.x,
         y: args.currentCoords.y,
     };
-    let possibleMoves: Coords[] = getPossibleRookMoves(cacheCurrentPosition);
-    for (let possibleMove of possibleMoves) {
-        actions.push({
-            type: "move",
-            payload: {
-                target: possibleMove,
-            },
-        });
+    let arr: boolean[] = [true, true, true, true];
+    let counter = 1;
+    while (arr[0] || arr[1] || arr[2] || arr[3]) {
+        for (let i = 0; i < arr.length; i++) {
+            if (i === 0 && arr[i]) {
+                if (
+                    cacheCurrentPosition.y - counter < minRow
+                ) {
+                    arr[0] = false;
+                } else if (
+                    args.boardState[cacheCurrentPosition.y - counter][cacheCurrentPosition.x
+                        
+                    ] === ""
+                ) {
+                    actions.push({
+                        type: "move",
+                        payload: {
+                            target: {
+                                x: cacheCurrentPosition.x,
+                                y: cacheCurrentPosition.y - counter,
+                            },
+                        },
+                    });
+                } else if (
+                    args.boardState[cacheCurrentPosition.y - counter][
+                        cacheCurrentPosition.x
+                    ].charAt(0) !== args.color
+                ) {
+                    actions.push({
+                        type: "take",
+                        payload: {
+                            target: {
+                                x: cacheCurrentPosition.x,
+                                y: cacheCurrentPosition.y - counter,
+                            },
+                        },
+                    });
+                    arr[0] = false;
+                } else if (
+                    args.boardState[cacheCurrentPosition.y - counter][
+                        cacheCurrentPosition.x - counter
+                    ].charAt(0) === args.color
+                ) {
+                    arr[0] = false;
+                }
+            } else if (i === 1 && arr[i]) {
+                if (
+                    cacheCurrentPosition.x + counter > maxCol
+                ) {
+                    arr[1] = false;
+                } else if (
+                    args.boardState[cacheCurrentPosition.y][
+                        cacheCurrentPosition.x + counter
+                    ] === ""
+                ) {
+                    actions.push({
+                        type: "move",
+                        payload: {
+                            target: {
+                                x: cacheCurrentPosition.x + counter,
+                                y: cacheCurrentPosition.y,
+                            },
+                        },
+                    });
+                } else if (
+                    args.boardState[cacheCurrentPosition.y][
+                        cacheCurrentPosition.x + counter
+                    ].charAt(0) !== args.color
+                ) {
+                    actions.push({
+                        type: "take",
+                        payload: {
+                            target: {
+                                x: cacheCurrentPosition.x + counter,
+                                y: cacheCurrentPosition.y,
+                            },
+                        },
+                    });
+                    arr[1] = false;
+                } else if (
+                    args.boardState[cacheCurrentPosition.y - counter][
+                        cacheCurrentPosition.x + counter
+                    ].charAt(0) === args.color
+                ) {
+                    arr[1] = false;
+                }
+            } else if (i === 2 && arr[i]) {
+                if (
+                    cacheCurrentPosition.y + counter > maxRow
+                ) {
+                    arr[2] = false;
+                } else if (
+                    args.boardState[cacheCurrentPosition.y + counter][
+                        cacheCurrentPosition.x
+                    ] === ""
+                ) {
+                    actions.push({
+                        type: "move",
+                        payload: {
+                            target: {
+                                x: cacheCurrentPosition.x,
+                                y: cacheCurrentPosition.y + counter,
+                            },
+                        },
+                    });
+                } else if (
+                    args.boardState[cacheCurrentPosition.y + counter][
+                        cacheCurrentPosition.x
+                    ].charAt(0) !== args.color
+                ) {
+                    actions.push({
+                        type: "take",
+                        payload: {
+                            target: {
+                                x: cacheCurrentPosition.x,
+                                y: cacheCurrentPosition.y + counter,
+                            },
+                        },
+                    });
+                    arr[2] = false;
+                } else if (
+                    args.boardState[cacheCurrentPosition.y + counter][
+                        cacheCurrentPosition.x + counter
+                    ].charAt(0) === args.color
+                ) {
+                    arr[2] = false;
+                }
+            } else if (i === 3 && arr[i]) {
+                if (
+                    cacheCurrentPosition.x - counter < minCol 
+                ) {
+                    arr[3] = false;
+                } else if (
+                    args.boardState[cacheCurrentPosition.y ][
+                        cacheCurrentPosition.x - counter
+                    ] === ""
+                ) {
+                    actions.push({
+                        type: "move",
+                        payload: {
+                            target: {
+                                x: cacheCurrentPosition.x - counter,
+                                y: cacheCurrentPosition.y,
+                            },
+                        },
+                    });
+                } else if (
+                    args.boardState[cacheCurrentPosition.y][
+                        cacheCurrentPosition.x - counter
+                    ].charAt(0) !== args.color
+                ) {
+                    actions.push({
+                        type: "take",
+                        payload: {
+                            target: {
+                                x: cacheCurrentPosition.x - counter,
+                                y: cacheCurrentPosition.y ,
+                            },
+                        },
+                    });
+                    arr[3] = false;
+                } else if (
+                    args.boardState[cacheCurrentPosition.y][
+                        cacheCurrentPosition.x - counter
+                    ].charAt(0) === args.color
+                ) {
+                    arr[3] = false;
+                }
+            }
+        }
+        counter++;
     }
     return actions;
 }
 
-function getPossibleRookMoves(pos: Coords): Coords[] {
-    let moves: Coords[] = [];
-    for (let row = 0; row <= maxRow; row++) {
-        if (row === pos.y) continue;
-        moves = [
-            ...moves,
-            <Coords>{
-                x: pos.x,
-                y: row,
-            },
-        ];
-    }
-    for (let col = 0; col <= maxCol; col++) {
-        if (col === pos.x) continue;
-        moves = [
-            ...moves,
-            <Coords>{
-                x: col,
-                y: pos.y,
-            },
-        ];
-    }
-
-    return moves;
-}
