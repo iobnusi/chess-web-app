@@ -33,6 +33,17 @@ export const initialBoardState: BoardState = [
     ["lr", "ln", "lb", "lq", "lk", "lb", "ln", "lr"],
 ];
 
+export const emptyBoardState: BoardState = [
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+]
+
 export const initialSquareGrid = [
     "light",
     "dark",
@@ -99,6 +110,8 @@ export const initialSquareGrid = [
     "dark",
     "light",
 ];
+
+export const numOfSquaresPerRow = 8
 
 export function parsePieceStringToPieceTypeAndColor(piece: string): {
     color: PieceColor;

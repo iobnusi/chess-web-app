@@ -37,8 +37,9 @@ function Piece(props: PieceProps) {
         x: props.currentCoords.x,
         y: props.currentCoords.y,
     });
-    const pieceWidth = props.boardProps.squareWidth;
-
+    
+    // on change if currentBoardCoords changes, update screenCoords
+    // occurs when this Piece component is moved by the user
     useEffect(() => {
         setScreenCoords(
             calculateMouseCoordinateFromBoardCoordinate({
@@ -48,12 +49,25 @@ function Piece(props: PieceProps) {
         );
     }, [currentBoardCoords]);
 
+    // on change if props.currentCoords changes, update screenCoords
+    // occurs when boardState updates
     useEffect(() => {
         setCurrentBoardCoords({
             x: props.currentCoords.x,
             y: props.currentCoords.y,
         });
     }, [props.currentCoords.x, props.currentCoords.y]);
+
+    // on change if boardProps.squareWidth changes, update screenCoords
+    // occurs when window is resized
+    useEffect(() => {
+        setScreenCoords(
+            {
+                x: props.currentCoords.x * props.boardProps.squareWidth,
+                y: props.currentCoords.y * props.boardProps.squareWidth,
+            }
+        );
+    }, [props.boardProps.squareWidth]);
 
     function handleDragStart(event: React.DragEvent<HTMLDivElement>) {
         setScreenCoords({
@@ -134,6 +148,7 @@ function Piece(props: PieceProps) {
                 })
             );
         }
+       
     }
 
     return (
@@ -157,10 +172,10 @@ function Piece(props: PieceProps) {
                 position: "absolute",
                 left: screenCoords.x,
                 top: screenCoords.y,
-                width: pieceWidth,
+                width: props.boardProps.squareWidth,
                 backgroundImage:
                     "url('https://www.pngmart.com/files/16/Battle-Chess-Pieces-PNG-File.png)')",
-                backgroundSize: "660px 220px",
+                backgroundSize: `${props.boardProps.squareWidth*6}px ${props.boardProps.squareWidth*2}px`,
                 backgroundPosition: `${convertPieceTypeToSpritePosition(
                     props.type
                 )} ${props.color === PieceColor.dark ? "bottom" : "top"}`,
