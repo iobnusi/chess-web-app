@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Piece from "../Piece/Piece";
 import {
     Coords,
@@ -12,6 +12,7 @@ import { movePiece } from "./board_state_util";
 import {
     BoardRowState,
     BoardState,
+    emptyBoardState,
     initialBoardState,
     initialSquareGrid,
     parseCoordsToSquareId,
@@ -20,14 +21,15 @@ import {
 export interface BoardProps {
     originX: number;
     originY: number;
-    squareWidth: number;
+    width: number;
+    squareWidth: number
 }
 
 function Board(props: BoardProps) {
     const numOfSquaresPerRow = 8;
     const [boardState, setBoardState] = useState(initialBoardState);
     const [squareGrid, setSquareGrid] = useState(initialSquareGrid);
-
+    
     function movePieceCallback(args: {
         action: PieceAction;
         currentPosition: Coords;
@@ -133,6 +135,7 @@ function Board(props: BoardProps) {
         markSquare(parseCoordsToSquareId(possibleCoords));
     }
 
+  
     return (
         <div
             key="chessBoard"
@@ -140,13 +143,13 @@ function Board(props: BoardProps) {
                 position: "absolute",
                 left: props.originX,
                 top: props.originY,
-                width: props.squareWidth * numOfSquaresPerRow,
+                width: props.width,
             }}
             className={"aspect-square"}
         >
             <div className="aspect-square grid grid-cols-8 z-0">
                 {squareGrid?.map((color, i) => {
-                    return <Square id={i} color={color}></Square>;
+                    return <Square id={i} width={props.width/8} color={color}></Square>;
                 })}
             </div>
             {boardState.map((rowState: BoardRowState, rowIndex: number) => {

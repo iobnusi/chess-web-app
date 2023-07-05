@@ -1,12 +1,13 @@
 interface SquareProps {
     color: string;
+    width: number;
     id: number;
 }
 function Square(props: SquareProps) {
     return (
         <div
             key={props.id}
-            className={`aspect-square w-[110px] 
+            className={`aspect-square w-[${props.width}px] 
         ${
             props.color === "mark"
                 ? "bg-mark"

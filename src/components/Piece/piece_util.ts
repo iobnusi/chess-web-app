@@ -1,5 +1,5 @@
 import { BoardProps } from "../Board/Board";
-import { BoardState } from "../Board/board_util";
+import { BoardState, numOfSquaresPerRow } from "../Board/board_util";
 
 const [minRow, minCol, maxRow, maxCol] = [0, 0, 7, 7];
 
@@ -35,10 +35,10 @@ export function calculateBoardCoordinateFromCursor(args: {
     boardProps: BoardProps;
 }): Coords {
     let x = Math.floor(
-        (args.mouseX - args.boardProps.originX) / args.boardProps.squareWidth
+        (args.mouseX - args.boardProps.originX) / (args.boardProps.squareWidth )
     );
     let y = Math.floor(
-        (args.mouseY - args.boardProps.originY) / args.boardProps.squareWidth
+        (args.mouseY - args.boardProps.originY) / (args.boardProps.squareWidth)
     );
     return x < 0 || x > 7 || y < 0 || y > 7
         ? <Coords>{
