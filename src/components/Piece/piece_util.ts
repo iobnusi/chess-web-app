@@ -129,9 +129,9 @@ export function generateActions(args: {
             break;
         case PieceTypes.knight:
             /* cases
-        - move in an "L" shape
-        - cant move to designated squares if ally pieces are there
-        - can take opposing pieces in designated squares
+        - move in an "L" shape (DONE)
+        - cant move to designated squares if ally pieces are there (DONE)
+        - can take opposing pieces in designated squares (DONE)
         - cant move if pinned to king
       */
             actions = generateKnightActions({
@@ -156,6 +156,11 @@ export function generateActions(args: {
         - can take oppposing pieces in its move path
         - cant move if pinned to king
       */
+            actions = generateRookActions({
+                currentCoords: args.currentCoords,
+                boardState: args.boardState,
+                color: args.pieceColor,
+            });
             break;
         default:
             throw new Error("Invalid Piece Type");
@@ -441,4 +446,52 @@ function getPossibleKnightMoves(pos: Coords): Coords[] {
         if (posChecks[i]) cacheMoves = [...cacheMoves, allMoves[i]];
     }
     return cacheMoves;
+}
+
+function generateRookActions(args: {
+    currentCoords: Coords;
+    boardState: BoardState;
+    color: PieceColor;
+}): PieceAction[] {
+    let actions: PieceAction[] = [];
+    let cacheCurrentPosition: Coords = {
+        x: args.currentCoords.x,
+        y: args.currentCoords.y,
+    };
+    let possibleMoves: Coords[] = getPossibleRookMoves(cacheCurrentPosition);
+    for (let possibleMove of possibleMoves) {
+        actions.push({
+            type: "move",
+            payload: {
+                target: possibleMove,
+            },
+        });
+    }
+    return actions;
+}
+
+function getPossibleRookMoves(pos: Coords): Coords[] {
+    let moves: Coords[] = [];
+    for (let row = 0; row <= maxRow; row++) {
+        if (row === pos.y) continue;
+        moves = [
+            ...moves,
+            <Coords>{
+                x: pos.x,
+                y: row,
+            },
+        ];
+    }
+    for (let col = 0; col <= maxCol; col++) {
+        if (col === pos.x) continue;
+        moves = [
+            ...moves,
+            <Coords>{
+                x: col,
+                y: pos.y,
+            },
+        ];
+    }
+
+    return moves;
 }
