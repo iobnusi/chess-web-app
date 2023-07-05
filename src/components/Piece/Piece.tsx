@@ -108,7 +108,7 @@ function Piece(props: PieceProps) {
             pieceType: props.type,
         });
         const validMoves: Coords[] =
-            props.type === PieceTypes.bishop
+            props.type === PieceTypes.bishop ||  props.type === PieceTypes.rook || props.type === PieceTypes.knight
                 ? getAllCoordsFromPieceActions(validActions)
                 : [newCoords];
         console.log("valid actions", validActions);
