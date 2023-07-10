@@ -29,6 +29,10 @@ export enum PieceColor {
     light = "l",
 }
 
+export interface PieceStates {
+    canPawnJump?: boolean
+}
+
 export function calculateBoardCoordinateFromCursor(args: {
     mouseX: number;
     mouseY: number;
@@ -93,6 +97,7 @@ export function generateActions(args: {
     currentCoords: Coords;
     pieceType: PieceTypes;
     pieceColor: PieceColor;
+    pieceStates: PieceStates
 }): PieceAction[] {
     let actions: PieceAction[] = [];
     switch (args.pieceType) {
@@ -106,6 +111,12 @@ export function generateActions(args: {
         - en passent
         - promote to any other piece if reach the other side of board
       */
+            actions = generatePawnActions({
+                currentCoords: args.currentCoords,
+                boardState: args.boardState,
+                color: args.pieceColor,
+                pieceStates: args.pieceStates
+            })
             break;
         case PieceTypes.bishop:
             /* cases
@@ -633,3 +644,99 @@ function generateRookActions(args: {
     return actions;
 }
 
+function generatePawnActions(args:{
+    currentCoords: Coords;
+    boardState: BoardState;
+    color: PieceColor;
+    pieceStates: PieceStates
+}): PieceAction[] {
+    let actions: PieceAction[] = [];
+    let cacheCurrentPosition: Coords = {
+        x: args.currentCoords.x,
+        y: args.currentCoords.y,
+    };
+    console.log("this pawn can jump?", args.pieceStates.canPawnJump)
+    let pawnDirection: number = args.color === PieceColor.light ? -1 : 1
+    console.log(args.boardState[cacheCurrentPosition.y+ (1*pawnDirection)][cacheCurrentPosition.x ])
+    
+    // moving forward
+    for (let i=1; i<= (args.pieceStates.canPawnJump ? 2:1); i++ ) {
+        if (args.boardState[cacheCurrentPosition.y+ (i*pawnDirection)][cacheCurrentPosition.x] === ""
+        ) {
+            if (cacheCurrentPosition.y+(i*pawnDirection) === (args.color === PieceColor.light ? minRow : maxRow )) {
+                actions.push ({
+                    type: "promote",
+                    payload: {
+                        target: {
+                            x: cacheCurrentPosition.x,
+                            y: cacheCurrentPosition.y+ (i*pawnDirection) ,
+                        },
+                    }
+                })
+            }
+            else actions.push({
+                type: "move",
+                payload: {
+                    target: {
+                        x: cacheCurrentPosition.x,
+                        y: cacheCurrentPosition.y+ (i*pawnDirection) ,
+                    },
+                },
+            });
+        } else break
+    }
+    // taking left
+    if (cacheCurrentPosition.x - 1 > minRow && 
+        args.boardState[cacheCurrentPosition.y+ (1*pawnDirection)][cacheCurrentPosition.x - 1] !== "" && 
+        args.boardState[cacheCurrentPosition.y+ (1*pawnDirection)][cacheCurrentPosition.x - 1].charAt(0) !== args.color
+    ) {
+        if (cacheCurrentPosition.y+(1*pawnDirection) === (args.color === PieceColor.light ? minRow : maxRow )) {
+            actions.push({
+                type: "promote",
+                payload: {
+                    target: {
+                        x: cacheCurrentPosition.x - 1,
+                        y: cacheCurrentPosition.y+ (1*pawnDirection) ,
+                    },
+                },
+            });
+        } else actions.push({
+            type: "take",
+            payload: {
+                target: {
+                    x: cacheCurrentPosition.x - 1,
+                    y: cacheCurrentPosition.y+ (1*pawnDirection) ,
+                },
+            },
+        });
+    }
+    // taking right
+    if (cacheCurrentPosition.x + 1 < maxRow && 
+        args.boardState[cacheCurrentPosition.y+ (1*pawnDirection)][cacheCurrentPosition.x + 1] !== "" && 
+        args.boardState[cacheCurrentPosition.y+ (1*pawnDirection)][cacheCurrentPosition.x + 1].charAt(0) !== args.color
+    ) {
+        if (cacheCurrentPosition.y+(1*pawnDirection) === (args.color === PieceColor.light ? minRow : maxRow )) {
+            actions.push({
+                type: "promote",
+                payload: {
+                    target: {
+                        x: cacheCurrentPosition.x + 1,
+                        y: cacheCurrentPosition.y+ (1*pawnDirection) ,
+                    },
+                },
+            });
+        } else actions.push({
+            type: "take",
+            payload: {
+                target: {
+                    x: cacheCurrentPosition.x + 1,
+                    y: cacheCurrentPosition.y+ (1*pawnDirection) ,
+                },
+            },
+        });
+    }
+
+
+   
+    return actions
+}

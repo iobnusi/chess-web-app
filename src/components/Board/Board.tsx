@@ -4,11 +4,12 @@ import {
     Coords,
     PieceAction,
     PieceColor,
+    PieceStates,
     PieceTypes,
     getAllCoordsFromPieceActions,
 } from "../Piece/piece_util";
 import Square from "../Square";
-import { movePiece } from "./board_state_util";
+import { movePiece, promotePawn } from "./board_state_util";
 import {
     BoardRowState,
     BoardState,
@@ -26,8 +27,7 @@ export interface BoardProps {
 }
 
 function Board(props: BoardProps) {
-    const numOfSquaresPerRow = 8;
-    const [boardState, setBoardState] = useState(initialBoardState);
+    const [boardState, setBoardState] = useState(emptyBoardState);
     const [squareGrid, setSquareGrid] = useState(initialSquareGrid);
     
     function movePieceCallback(args: {
@@ -35,7 +35,7 @@ function Board(props: BoardProps) {
         currentPosition: Coords;
     }) {
         let cacheBoardState: string[][] = boardState.map((arr) => arr.slice());
-
+        console.log(args.action.type)
         // update board on piece move
         if (args.action.type === "move" || args.action.type === "take") {
             cacheBoardState = movePiece({
@@ -46,7 +46,11 @@ function Board(props: BoardProps) {
         } else if (args.action.type === "check") {
             //TODO
         } else if (args.action.type === "promote") {
-            //TODO
+            cacheBoardState = promotePawn({
+                current: args.currentPosition,
+                target: args.action.payload.target,
+                state: cacheBoardState as BoardState,
+            })
         }
 
         setBoardState(cacheBoardState as BoardState);
@@ -147,7 +151,7 @@ function Board(props: BoardProps) {
             }}
             className={"aspect-square"}
         >
-            <div className="aspect-square grid grid-cols-8 z-0">
+            <div className="aspect-square grid grid-cols-8">
                 {squareGrid?.map((color, i) => {
                     return <Square id={i} width={props.width/8} color={color}></Square>;
                 })}
@@ -165,6 +169,9 @@ function Board(props: BoardProps) {
                                 }}
                                 color={state.charAt(0) as PieceColor}
                                 type={state.charAt(1) as PieceTypes}
+                                pieceStates={{
+                                    canPawnJump: state.charAt(2) === "*"
+                                } as PieceStates} 
                                 boardProps={props}
                                 boardState={boardState}
                                 moveCallback={movePieceCallback}

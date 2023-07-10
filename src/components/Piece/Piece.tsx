@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BoardProps } from "../Board/Board";
 import { BoardState } from "../Board/board_util";
 import {
     Coords,
     PieceAction,
     PieceColor,
+    PieceStates,
     PieceTypes,
     calculateBoardCoordinateFromCursor,
     calculateMouseCoordinateFromBoardCoordinate,
@@ -12,6 +13,7 @@ import {
     generateActions,
     getAllCoordsFromPieceActions,
 } from "./piece_util";
+import ReactDOM from "react-dom";
 
 interface PieceProps {
     className?: string;
@@ -19,6 +21,7 @@ interface PieceProps {
     currentCoords: Coords;
     type: PieceTypes;
     color: PieceColor;
+    pieceStates: PieceStates;
     boardProps: BoardProps;
     boardState: BoardState;
     moveCallback: (args: {
@@ -29,6 +32,7 @@ interface PieceProps {
 }
 
 function Piece(props: PieceProps) {
+    
     const [screenCoords, setScreenCoords] = useState<Coords>({
         x: props.currentCoords.x * props.boardProps.squareWidth,
         y: props.currentCoords.y * props.boardProps.squareWidth,
@@ -106,11 +110,9 @@ function Piece(props: PieceProps) {
             currentCoords: currentBoardCoords,
             pieceColor: props.color,
             pieceType: props.type,
+            pieceStates: props.pieceStates
         });
-        const validMoves: Coords[] =
-            props.type === PieceTypes.bishop ||  props.type === PieceTypes.rook || props.type === PieceTypes.knight
-                ? getAllCoordsFromPieceActions(validActions)
-                : [newCoords];
+        const validMoves: Coords[] = getAllCoordsFromPieceActions(validActions)
         console.log("valid actions", validActions);
         console.log("valid movves", validMoves);
         // find newCoords in validMoves, is -1 if newCoords cannot be found
@@ -125,15 +127,7 @@ function Piece(props: PieceProps) {
         if (newCoordsIndexInValidMoves !== -1) {
             console.log("move valid, updating board state");
             props.moveCallback({
-                action:
-                    props.type === PieceTypes.bishop
-                        ? validActions[newCoordsIndexInValidMoves]
-                        : {
-                              type: "move",
-                              payload: {
-                                  target: newCoords,
-                              },
-                          },
+                action: validActions[newCoordsIndexInValidMoves],
                 currentPosition: {
                     x: currentBoardCoords.x,
                     y: currentBoardCoords.y,
@@ -151,10 +145,12 @@ function Piece(props: PieceProps) {
        
     }
 
+
+
     return (
         <div
             key={props.id}
-            className={`aspect-square overflow-hidden ${props.className}`}
+            className={`aspect-square overflow-hidden hover:z-50 ${props.className}`}
             onDragStart={handleDragStart}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
@@ -165,8 +161,10 @@ function Piece(props: PieceProps) {
                         currentCoords: currentBoardCoords,
                         pieceColor: props.color,
                         pieceType: props.type,
+                        pieceStates: props.pieceStates
                     })
                 );
+                
             }}
             style={{
                 position: "absolute",

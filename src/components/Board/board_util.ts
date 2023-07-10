@@ -24,23 +24,23 @@ export type BoardRowState = [
 
 export const initialBoardState: BoardState = [
     ["dr", "dn", "db", "dq", "dk", "db", "dn", "dr"],
-    ["dp", "dp", "dp", "dp", "dp", "dp", "dp", "dp"],
+    ["dp*", "dp*", "dp*", "dp*", "dp*", "dp*", "dp*", "dp*"],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
-    ["lp", "lp", "lp", "lp", "lp", "lp", "lp", "lp"],
+    ["lp*", "lp*", "lp*", "lp*", "lp*", "lp*", "lp*", "lp*"],
     ["lr", "ln", "lb", "lq", "lk", "lb", "ln", "lr"],
 ];
 
 export const emptyBoardState: BoardState = [
+    ["", "", "dn", "", "dn", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", ""],
+    ["", "", "", "lp*", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
 ]
 
@@ -112,12 +112,13 @@ export const initialSquareGrid = [
 ];
 
 export const numOfSquaresPerRow = 8
+export const maxPieceStringLength = 3
 
 export function parsePieceStringToPieceTypeAndColor(piece: string): {
     color: PieceColor;
     type: PieceTypes;
 } {
-    if (piece === "" || piece.length !== 2) {
+    if (piece === "" || piece.length > maxPieceStringLength) {
         throw new Error("Invalid Or Empty Piece String");
     }
     return {
